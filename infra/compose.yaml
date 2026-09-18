@@ -1,0 +1,8 @@
+name: clone-tabnews
+services:
+  database:
+    image: postgres:16.15-alpine
+    environment:
+      POSTGRES_PASSWORD: "local_host"
+    ports:
+      - 5432:5432
