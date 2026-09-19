@@ -13,6 +13,10 @@ it("Fetch para Status page deve retornar 200", async () => {
   expect(response.status).toBe(200);
 
   const responseBody = (await response.json()) as StatusResponse;
+
+  expect(responseBody).toEqual({
+    status: "ok",
+  });
 });
 
 export {};
