@@ -17,9 +17,11 @@ export default async function status(
   const maxConnections = await query("SHOW max_connections");
   const maxUsageConnections = maxConnections.rows[0].max_connections;
 
-  const usageConnections = await query(
-    "SELECT count(*)::int AS opened_connections FROM pg_stat_activity WHERE datname = 'local_db'"
-  );
+  const databaseNM = process.env.POSTGRES_DB;
+  const usageConnections = await query({
+    text: "SELECT count(*)::int AS opened_connections FROM pg_stat_activity WHERE datname = $1",
+    values: [databaseNM],
+  });
   const usageConnection = usageConnections.rows[0].opened_connections;
 
   const dbVersion = await query("SHOW server_version");
