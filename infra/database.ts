@@ -7,16 +7,16 @@ export async function query(databaseQuery) {
     const result = await client.query(databaseQuery);
     return result;
   } catch (error) {
-    console.log("error"); // TODO Implementar Error Customizado
+    console.error(error); // TODO Implementar Error Customizado
   } finally {
     await client?.end();
   }
 }
 
 async function getNewClient() {
-  const client = await new Client({
+  const client = new Client({
     host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
+    port: Number(process.env.POSTGRES_PORT),
     user: process.env.POSTGRES_USER,
     database: process.env.POSTGRES_DB,
     password: process.env.POSTGRES_PASSWORD,
