@@ -14,18 +14,18 @@ export default async function status(
 ) {
   const updatedAt = new Date().toISOString();
 
-  const maxConnections = await query("SHOW max_connections");
+  const dbVersion = await query("SHOW server_version;");
+  const serverVersion = dbVersion.rows[0].server_version;
+
+  const maxConnections = await query("SHOW max_connections;");
   const maxUsageConnections = maxConnections.rows[0].max_connections;
 
-  const databaseNM = process.env.POSTGRES_DB;
+  const databasedb = process.env.POSTGRES_DB;
   const usageConnections = await query({
-    text: "SELECT count(*)::int AS opened_connections FROM pg_stat_activity WHERE datname = $1",
-    values: [databaseNM],
+    text: "SELECT count(*)::int FROM pg_stat_activity WHERE datname = $1;",
+    values: [databasedb],
   });
-  const usageConnection = usageConnections.rows[0].opened_connections;
-
-  const dbVersion = await query("SHOW server_version");
-  const serverVersion = dbVersion.rows[0].server_version;
+  const usageConnection = usageConnections.rows[0].count;
 
   return res.status(200).send({
     updated_at: updatedAt,
