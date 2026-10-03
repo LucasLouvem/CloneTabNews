@@ -6,14 +6,18 @@ export default async function status(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const migrations = await MigrationRunner({
-    databaseUrl: process.env.DATABASE_URL,
-    dir: join("infra", "migrations"),
-    dryRun: true,
-    direction: "up",
-    migrationsTable: "pgmigrations",
-    verbose: false,
-  });
+  const methodAlloweds: string[] = ["GET", "POST"];
 
-  return res.status(200).send(migrations);
+  if (methodAlloweds.includes(req.method)) {
+    const migrations = await MigrationRunner({
+      databaseUrl: process.env.DATABASE_URL,
+      dir: join("infra", "migrations"),
+      dryRun: req.method === "GET" ? true : false,
+      direction: "up",
+      migrationsTable: "pgmigrations",
+      verbose: false,
+    });
+    return res.status(200).send(migrations);
+  }
+  return res.status(405).send([]);
 }
