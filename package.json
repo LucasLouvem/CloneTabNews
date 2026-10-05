@@ -15,7 +15,7 @@
     "migrations:up": "node-pg-migrate -m infra/migrations --envPath .env.development up",
     "prettier:check": "prettier --check .",
     "prettier:fix": "prettier --write .",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:watch": "jest --watchAll --runInBand"
   },
   "dependencies": {
