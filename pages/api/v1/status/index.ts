@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { query } from "infra/database";
+import database from "infra/database";
 
 type StatusResponse = {
   updated_at: string;
@@ -14,14 +14,14 @@ export default async function status(
 ) {
   const updatedAt = new Date().toISOString();
 
-  const dbVersion = await query("SHOW server_version;");
+  const dbVersion = await database.query("SHOW server_version;");
   const serverVersion = dbVersion.rows[0].server_version;
 
-  const maxConnections = await query("SHOW max_connections;");
+  const maxConnections = await database.query("SHOW max_connections;");
   const maxUsageConnections = maxConnections.rows[0].max_connections;
 
   const databasedb = process.env.POSTGRES_DB;
-  const usageConnections = await query({
+  const usageConnections = await database.query({
     text: "SELECT count(*)::int FROM pg_stat_activity WHERE datname = $1;",
     values: [databasedb],
   });
