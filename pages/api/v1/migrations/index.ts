@@ -17,7 +17,13 @@ export default async function status(
       migrationsTable: "pgmigrations",
       verbose: false,
     });
+
+    if (migrations.length > 0 && req.method == "POST") {
+      return res.status(201).send(migrations);
+    }
+
     return res.status(200).send(migrations);
   }
+
   return res.status(405).send([]);
 }
