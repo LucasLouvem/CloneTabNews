@@ -1,7 +1,9 @@
-import { Client } from "pg";
+import { Client, QueryConfig, QueryResult } from "pg";
 
-async function query(databaseQuery) {
-  let client;
+async function query(
+  databaseQuery: string | QueryConfig
+): Promise<QueryResult> {
+  let client: Client;
   try {
     client = await getNewClient();
     const result = await client.query(databaseQuery);
@@ -30,6 +32,7 @@ async function getNewClient() {
 
 const database = {
   query,
+  getNewClient,
 };
 
 export default database;

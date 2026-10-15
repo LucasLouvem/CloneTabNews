@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import MigrationRunner from "node-pg-migrate";
 import { join } from "path";
+import database from "infra/database";
 
 export default async function status(
   req: NextApiRequest,
@@ -9,14 +10,17 @@ export default async function status(
   const methodAlloweds: string[] = ["GET", "POST"];
 
   if (methodAlloweds.includes(req.method)) {
+    let dbClient = await database.getNewClient();
     const migrations = await MigrationRunner({
-      databaseUrl: process.env.DATABASE_URL,
+      dbClient: dbClient,
       dir: join("infra", "migrations"),
       dryRun: req.method === "GET" ? true : false,
       direction: "up",
       migrationsTable: "pgmigrations",
       verbose: false,
     });
+
+    await dbClient.end();
 
     if (migrations.length > 0 && req.method == "POST") {
       return res.status(201).send(migrations);
