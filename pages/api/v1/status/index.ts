@@ -3,9 +3,11 @@ import database from "infra/database";
 
 type StatusResponse = {
   updated_at: string;
-  db_version: string;
-  usage_connections: number;
-  max_connections: number;
+  dependencies: {
+    version: string;
+    max_connections: number;
+    opened_connections: number;
+  };
 };
 
 export default async function status(
@@ -29,8 +31,10 @@ export default async function status(
 
   return res.status(200).send({
     updated_at: updatedAt,
-    usage_connections: usageConnection,
-    max_connections: parseInt(maxUsageConnections),
-    db_version: serverVersion,
+    dependencies: {
+      version: serverVersion,
+      max_connections: parseInt(maxUsageConnections),
+      opened_connections: usageConnection,
+    },
   });
 }

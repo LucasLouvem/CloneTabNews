@@ -18,9 +18,11 @@ it("Fetch para Status page deve retornar 200", async () => {
 
   expect(responseBody).toEqual({
     updated_at: parsedUpdatedAt,
-    db_version: "16.15",
-    usage_connections: 1,
-    max_connections: 100,
+    dependencies: {
+      version: "16.15",
+      max_connections: 100,
+      opened_connections: 1,
+    },
   });
 });
 
