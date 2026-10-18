@@ -30,4 +30,18 @@ it("POST para /migrations deve retornar 201 na primeira execução e 200 na segu
   expect(response2Body.length).toBe(0);
 });
 
+it("DELETE para /migrations deve retornar MethodNowAllowedError", async () => {
+  const response = await fetch(`${url}/api/v1/migrations`, {
+    method: "DELETE",
+  });
+
+  expect(response.status).toBe(405);
+
+  const responseBody = await response.json();
+
+  expect(responseBody).toEqual({
+    error: "MethodNotAllowed",
+  });
+});
+
 export {};
