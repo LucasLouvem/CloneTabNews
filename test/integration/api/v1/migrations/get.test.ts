@@ -1,6 +1,9 @@
 import orchestrator from "test/orchestrator";
 
-beforeAll(orchestrator.clearDatabase);
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
+});
 
 const url = "http:127.0.0.1:3000";
 
