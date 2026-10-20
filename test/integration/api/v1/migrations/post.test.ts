@@ -2,7 +2,10 @@ import orchestrator from "test/orchestrator";
 
 const url = "http:127.0.0.1:3000";
 
-beforeAll(orchestrator.clearDatabase);
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
+});
 
 it("POST para /migrations deve retornar 201 na primeira execução e 200 na segunda", async () => {
   const response = await fetch(`${url}/api/v1/migrations`, {

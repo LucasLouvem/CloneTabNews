@@ -11,6 +11,7 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 export default {
   testEnvironment: "node",
   moduleDirectories: ["node_modules", "<rootDir>"],
+  testTimeout: 6000,
   transform: {
     ...tsJestTransformCfg,
   },
