@@ -16,5 +16,3 @@ it("GET para /migrations deve retornar 200", async () => {
 
   expect(Array.isArray(responseBody)).toEqual(true);
 });
-
-export {};

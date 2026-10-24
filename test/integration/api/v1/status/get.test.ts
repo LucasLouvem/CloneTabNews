@@ -31,5 +31,3 @@ it("Fetch para Status page deve retornar 200", async () => {
     },
   });
 });
-
-export {};
