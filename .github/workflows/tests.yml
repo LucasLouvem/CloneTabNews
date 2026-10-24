@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   Jest:
-    name: Jest Ubuntu
+    name: Jest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
