@@ -46,5 +46,3 @@ it("DELETE para /migrations deve retornar MethodNowAllowedError", async () => {
     error: "MethodNotAllowed",
   });
 });
-
-export {};
