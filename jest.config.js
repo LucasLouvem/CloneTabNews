@@ -8,7 +8,8 @@ dotenv.config({
 const tsJestTransformCfg = createDefaultPreset().transform;
 
 /** @type {import("jest").Config} **/
-export default {
+
+const settings = {
   testEnvironment: "node",
   moduleDirectories: ["node_modules", "<rootDir>"],
   testTimeout: 10000,
@@ -16,3 +17,5 @@ export default {
     ...tsJestTransformCfg,
   },
 };
+
+export default settings;

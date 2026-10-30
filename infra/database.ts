@@ -1,7 +1,7 @@
 import { Client, QueryConfig, QueryResult } from "pg";
 
 async function query(
-  databaseQuery: string | QueryConfig
+  databaseQuery: string | QueryConfig,
 ): Promise<QueryResult> {
   let client: Client;
   try {

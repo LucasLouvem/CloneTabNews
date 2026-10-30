@@ -12,7 +12,7 @@ type StatusResponse = {
 
 export default async function status(
   req: NextApiRequest,
-  res: NextApiResponse<StatusResponse>
+  res: NextApiResponse<StatusResponse>,
 ) {
   const updatedAt = new Date().toISOString();
 
