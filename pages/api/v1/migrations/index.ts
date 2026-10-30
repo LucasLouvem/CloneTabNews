@@ -6,7 +6,7 @@ import { Client } from "pg";
 
 export default async function status(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const methodAlloweds: string[] = ["GET", "POST"];
 

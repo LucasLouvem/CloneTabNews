@@ -10,7 +10,7 @@ function connectionReady() {
         return;
       }
       process.stdout.write("\n🟢 Postgres aceitando conexões\n\n");
-    }
+    },
   );
 }
 
