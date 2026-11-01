@@ -13,21 +13,25 @@ beforeAll(async () => {
   await orchestrator.clearDatabase();
 });
 
-it("Fetch para Status page deve retornar 200", async () => {
-  const response = await fetch(`${url}/api/v1/status`);
+describe("GET /status", () => {
+  describe("Anonymous user", () => {
+    it("Recebe os dados da API de status", async () => {
+      const response = await fetch(`${url}/api/v1/status`);
 
-  expect(response.status).toBe(200);
+      expect(response.status).toBe(200);
 
-  const responseBody = (await response.json()) as StatusResponse;
+      const responseBody = (await response.json()) as StatusResponse;
 
-  const parsedUpdatedAt = new Date(responseBody.updated_at).toISOString();
+      const parsedUpdatedAt = new Date(responseBody.updated_at).toISOString();
 
-  expect(responseBody).toEqual({
-    updated_at: parsedUpdatedAt,
-    dependencies: {
-      version: "16.15",
-      max_connections: 100,
-      opened_connections: 1,
-    },
+      expect(responseBody).toEqual({
+        updated_at: parsedUpdatedAt,
+        dependencies: {
+          version: "16.15",
+          max_connections: 100,
+          opened_connections: 1,
+        },
+      });
+    });
   });
 });
