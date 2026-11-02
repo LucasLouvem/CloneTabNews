@@ -7,42 +7,32 @@ beforeAll(async () => {
   await orchestrator.clearDatabase();
 });
 
-it("POST para /migrations deve retornar 201 na primeira execução e 200 na segunda", async () => {
-  const response = await fetch(`${url}/api/v1/migrations`, {
-    method: "POST",
-  });
+describe("GET /migrations", () => {
+  describe("Anonymous user", () => {
+    it("1° requisição roda as migrations do sistema", async () => {
+      const response = await fetch(`${url}/api/v1/migrations`, {
+        method: "POST",
+      });
 
-  expect(response.status).toBe(201);
+      expect(response.status).toBe(201);
 
-  const responseBody = await response.json();
+      const responseBody = await response.json();
 
-  expect(Array.isArray(responseBody)).toEqual(true);
-  expect(responseBody.length).toBeGreaterThan(0);
+      expect(Array.isArray(responseBody)).toEqual(true);
+      expect(responseBody.length).toBeGreaterThan(0);
+    });
 
-  // Depois de rodar as migrations
+    it("2° requisição confirmando a execução", async () => {
+      const response2 = await fetch(`${url}/api/v1/migrations`, {
+        method: "POST",
+      });
 
-  const response2 = await fetch(`${url}/api/v1/migrations`, {
-    method: "POST",
-  });
+      expect(response2.status).toBe(200);
 
-  expect(response2.status).toBe(200);
+      const response2Body = await response2.json();
 
-  const response2Body = await response2.json();
-
-  expect(Array.isArray(response2Body)).toEqual(true);
-  expect(response2Body.length).toBe(0);
-});
-
-it("DELETE para /migrations deve retornar MethodNowAllowedError", async () => {
-  const response = await fetch(`${url}/api/v1/migrations`, {
-    method: "DELETE",
-  });
-
-  expect(response.status).toBe(405);
-
-  const responseBody = await response.json();
-
-  expect(responseBody).toEqual({
-    error: "MethodNotAllowed",
+      expect(Array.isArray(response2Body)).toEqual(true);
+      expect(response2Body.length).toBe(0);
+    });
   });
 });

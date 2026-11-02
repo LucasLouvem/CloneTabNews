@@ -6,13 +6,16 @@ beforeAll(async () => {
 });
 
 const url = "http:127.0.0.1:3000";
+describe("GET /migrations", () => {
+  describe("Anonymous user", () => {
+    it("Recebe retorno da API de migrations", async () => {
+      const response = await fetch(`${url}/api/v1/migrations`);
 
-it("GET para /migrations deve retornar 200", async () => {
-  const response = await fetch(`${url}/api/v1/migrations`);
+      expect(response.status).toBe(200);
 
-  expect(response.status).toBe(200);
+      const responseBody = await response.json();
 
-  const responseBody = await response.json();
-
-  expect(Array.isArray(responseBody)).toEqual(true);
+      expect(Array.isArray(responseBody)).toEqual(true);
+    });
+  });
 });
