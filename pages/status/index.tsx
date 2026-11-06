@@ -30,7 +30,7 @@ function UpdatedAt() {
 
   return (
     <div>
-      <pre>Ultima atualização: {UpdatedAtText}</pre>
+      <pre>Última atualização: {UpdatedAtText}</pre>
     </div>
   );
 }

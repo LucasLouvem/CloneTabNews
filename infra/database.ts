@@ -1,15 +1,21 @@
 import { Client, QueryConfig, QueryResult } from "pg";
+import { ServiceError } from "./errors";
 
 async function query(
   databaseQuery: string | QueryConfig,
 ): Promise<QueryResult> {
   let client: Client;
+
   try {
     client = await getNewClient();
     const result = await client.query(databaseQuery);
     return result;
   } catch (error) {
-    console.error(error); // TODO Implementar Error Customizado
+    const ServiceErrorObject = new ServiceError({
+      message: "Erro na conexão com Banco ou na Query.",
+      cause: error,
+    });
+    throw ServiceErrorObject;
   } finally {
     await client?.end();
   }
