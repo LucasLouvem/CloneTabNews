@@ -8,7 +8,7 @@ const ConfigMigrationRunner = {
   dryRun: true,
   direction: "up" as const,
   migrationsTable: "pgmigrations",
-  verbose: false,
+  log: () => {},
 };
 
 async function listPendingMigrations() {
