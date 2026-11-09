@@ -3,6 +3,7 @@ import {
   MethodNotAllowed,
   InternalServerError,
   ServiceError,
+  ValidationError,
 } from "infra/errors";
 
 async function OnNoMatchHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -16,6 +17,10 @@ async function OnErrorHandler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  if (err instanceof ValidationError) {
+    return res.status(err.statusCode).send(err);
+  }
+
   const PublicErrorObject = new InternalServerError({
     statusCode: err instanceof ServiceError ? err.statusCode : undefined,
     cause: err,

@@ -11,9 +11,9 @@ const ConfigMigrationRunner = {
   log: () => {},
 };
 
-async function listPendingMigrations() {
-  let dbClient: Client;
+let dbClient: Client | undefined;
 
+async function listPendingMigrations() {
   try {
     dbClient = await database.getNewClient();
     const migrations = await MigrationRunner({
@@ -28,8 +28,6 @@ async function listPendingMigrations() {
 }
 
 async function runningPendingMigrations() {
-  let dbClient: Client;
-
   try {
     dbClient = await database.getNewClient();
     const migrations = await MigrationRunner({

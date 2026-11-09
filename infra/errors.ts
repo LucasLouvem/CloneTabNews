@@ -2,7 +2,7 @@ export class InternalServerError extends Error {
   action: string;
   statusCode: number;
 
-  constructor({ cause, statusCode }) {
+  constructor({ cause, statusCode }: { cause?: unknown; statusCode?: number }) {
     super("Um erro interno não esperado aconteceu", {
       cause,
     });
@@ -25,13 +25,44 @@ export class ServiceError extends Error {
   action: string;
   statusCode: number;
 
-  constructor({ cause, message }) {
+  constructor({ cause, message }: { cause?: unknown; message?: string }) {
     super(message || "Serviço indisponível no momento", {
       cause,
     });
     this.name = "ServiceError";
     this.action = "Verifique se o serviço está disponível";
     this.statusCode = 503;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
+export class ValidationError extends Error {
+  action: string;
+  statusCode: number;
+
+  constructor({
+    cause,
+    message,
+    action,
+  }: {
+    cause?: unknown;
+    message?: string;
+    action?: string;
+  }) {
+    super(message || "Ocorreu um error de validação", {
+      cause,
+    });
+    this.name = "ValidationError";
+    this.action = action || "Ajuste os dados da requisição";
+    this.statusCode = 400;
   }
 
   toJSON() {

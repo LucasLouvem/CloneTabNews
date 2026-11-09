@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import type { ReactNode } from "react";
 
-async function fecthAPI(key) {
+async function fecthAPI(key: string) {
   const response = await fetch(key);
   const responseBody = response.json();
   return responseBody;

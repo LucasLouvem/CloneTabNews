@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { createRouter } from "next-connect";
 import controller from "infra/controller";
+import user from "models/user";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
@@ -9,5 +10,8 @@ router.post(postHandler);
 export default router.handler(controller.errorHandler);
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  return res.status(201).send({});
+  const userInputValues = req.body;
+  const newUser = await user.create(userInputValues);
+
+  return res.status(201).send(newUser);
 }
