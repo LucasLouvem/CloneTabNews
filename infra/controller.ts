@@ -4,6 +4,7 @@ import {
   InternalServerError,
   ServiceError,
   ValidationError,
+  NotFoundError,
 } from "infra/errors";
 
 async function OnNoMatchHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -17,7 +18,7 @@ async function OnErrorHandler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (err instanceof ValidationError) {
+  if (err instanceof ValidationError || err instanceof NotFoundError) {
     return res.status(err.statusCode).send(err);
   }
 

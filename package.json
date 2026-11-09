@@ -42,6 +42,7 @@
     "@types/async-retry": "1.4.9",
     "@types/jest": "29.5.14",
     "@types/node": "18.19.130",
+    "@types/pg": "8.23.1",
     "@types/react": "18.3.31",
     "@typescript-eslint/eslint-plugin": "7.2.0",
     "commitizen": "4.3.0",

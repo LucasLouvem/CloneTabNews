@@ -1,5 +1,5 @@
 import database from "infra/database";
-import { ValidationError } from "infra/errors";
+import { ValidationError, NotFoundError } from "infra/errors";
 
 export interface UserInputValues {
   username: string;
@@ -14,6 +14,29 @@ export interface User {
   password: string;
   created_at: Date;
   updated_at: Date;
+}
+
+async function findOneByUsername(username: string) {
+  const findUser = await database.query<User>({
+    text: `
+      SELECT 
+        *
+      FROM
+        users 
+      WHERE 
+        LOWER(username) = LOWER($1)
+      ;`,
+    values: [username],
+  });
+
+  if (findUser.rows.length === 0) {
+    throw new NotFoundError({
+      message: "Usuário não encontrado.",
+      action: "Verifique o nome de usuário e tente novamente.",
+    });
+  }
+
+  return findUser.rows[0];
 }
 
 async function create(userInputValues: UserInputValues): Promise<User> {
@@ -42,7 +65,7 @@ async function create(userInputValues: UserInputValues): Promise<User> {
         action: "Revise os dados ou tente recuperar o acesso à sua conta.",
       });
     }
-    return result;
+    return result.rows;
   }
 
   async function validateUniqueUsername(username: string) {
@@ -68,7 +91,7 @@ async function create(userInputValues: UserInputValues): Promise<User> {
   }
 
   async function runInsertQuery(userInputValues: UserInputValues) {
-    const result = await database.query<User>({
+    const insertResult = await database.query<User>({
       text: `
       INSERT INTO 
         users (username, email, password) 
@@ -84,12 +107,13 @@ async function create(userInputValues: UserInputValues): Promise<User> {
       ],
     });
 
-    return result.rows[0];
+    return insertResult.rows[0];
   }
 }
 
 const user = {
   create,
+  findOneByUsername,
 };
 
 export default user;
