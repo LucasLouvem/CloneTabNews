@@ -1,14 +1,14 @@
-import { Client, QueryConfig, QueryResult } from "pg";
+import { Client, QueryConfig, QueryResult, QueryResultRow } from "pg";
 import { ServiceError } from "./errors";
 
-async function query(
+async function query<T extends QueryResultRow = QueryResultRow>(
   databaseQuery: string | QueryConfig,
-): Promise<QueryResult> {
-  let client: Client;
+): Promise<QueryResult<T>> {
+  let client: Client | undefined;
 
   try {
     client = await getNewClient();
-    const result = await client.query(databaseQuery);
+    const result = await client.query<T>(databaseQuery);
     return result;
   } catch (error) {
     const ServiceErrorObject = new ServiceError({
