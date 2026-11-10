@@ -1,5 +1,7 @@
 import orchestrator from "test/orchestrator";
+import user from "models/user";
 import { version as uuidVersion } from "uuid";
+import password from "models/password";
 
 const url = "http:127.0.0.1:3000";
 
@@ -35,7 +37,7 @@ describe("POST /users", () => {
         id: responseBody.id,
         username: "teste",
         email: "teste@teste.com",
-        password: "senha123",
+        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -43,6 +45,21 @@ describe("POST /users", () => {
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      const userInDatabase = await user.findOneByUsername("teste");
+
+      const correctPasswordMatch = await password.compare(
+        "senha123",
+        userInDatabase.password,
+      );
+
+      const incorrectPasswordMatch = await password.compare(
+        "senhaErrada",
+        userInDatabase.password,
+      );
+
+      expect(correctPasswordMatch).toBe(true);
+      expect(incorrectPasswordMatch).toBe(false);
     });
 
     it("Com email duplicado", async () => {
