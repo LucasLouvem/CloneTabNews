@@ -35,22 +35,19 @@ describe("PATCH /api/v1/users/[username]", () => {
     it("Retorna 400 para username já cadastrado", async () => {
       await orchestrator.createUser({
         username: "teste",
-        email: "teste@teste.com",
       });
 
       await orchestrator.createUser({
         username: "teste2",
-        email: "teste2@teste.com",
-        password: "senha123",
       });
 
-      const response = await fetch(`${url}/api/v1/users/teste2`, {
+      const response = await fetch(`${url}/api/v1/users/teste`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          username: "teste",
+          username: "teste2",
         }),
       });
 
@@ -69,7 +66,6 @@ describe("PATCH /api/v1/users/[username]", () => {
     it("Retorna 400 para email já cadastrado", async () => {
       await orchestrator.createUser({
         username: "teste",
-        email: "teste@teste.com",
       });
 
       await orchestrator.createUser({

@@ -2,9 +2,10 @@ import database from "infra/database";
 import retry from "async-retry";
 import migrator from "models/migrator";
 import user from "models/user";
+import { faker } from "@faker-js/faker";
 
 type CreateUser = {
-  username: string;
+  username?: string;
   email?: string;
   password?: string;
 };
@@ -35,9 +36,10 @@ async function waitForAllServices() {
 
 async function createUser(userObj: CreateUser) {
   return await user.create({
-    username: userObj.username,
-    email: userObj.email || "teste@teste.com",
-    password: userObj.password || "senha123",
+    username:
+      userObj.username || faker.internet.username().replace(/[.-_]/, ""),
+    email: userObj.email || faker.internet.email(),
+    password: userObj.password || faker.internet.password(),
   });
 }
 

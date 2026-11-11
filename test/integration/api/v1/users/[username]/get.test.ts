@@ -15,73 +15,55 @@ beforeEach(async () => {
 describe("GET /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     it("Encontra usuário com maiúsculas e minúsculas iguais", async () => {
-      const response = await fetch(`${url}/api/v1/users`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/JSON",
-        },
-        body: JSON.stringify({
-          username: "MesmoCaso",
-          email: "teste@teste.com",
-          password: "senha123",
-        }),
-      });
-
-      expect(response.status).toBe(201);
-
-      const response2 = await fetch(`${url}/api/v1/users/MesmoCaso`);
-
-      expect(response2.status).toBe(200);
-
-      const response2Body = await response2.json();
-
-      expect(response2Body).toEqual({
-        id: response2Body.id,
+      await orchestrator.createUser({
         username: "MesmoCaso",
-        email: "teste@teste.com",
-        password: response2Body.password,
-        created_at: response2Body.created_at,
-        updated_at: response2Body.updated_at,
       });
 
-      expect(uuidVersion(response2Body.id)).toBe(4);
-      expect(Date.parse(response2Body.created_at)).not.toBeNaN();
-      expect(Date.parse(response2Body.updated_at)).not.toBeNaN();
+      const response = await fetch(`${url}/api/v1/users/MesmoCaso`);
+
+      expect(response.status).toBe(200);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        id: responseBody.id,
+        username: "MesmoCaso",
+        email: responseBody.email,
+        password: responseBody.password,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
+      });
+
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
     it("Encontra usuário com maiúsculas e minúsculas diferentes", async () => {
-      const response = await fetch(`${url}/api/v1/users`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/JSON",
-        },
-        body: JSON.stringify({
-          username: "outrocaso",
-          email: "teste@teste.com",
-          password: "senha123",
-        }),
-      });
-
-      expect(response.status).toBe(201);
-
-      const response2 = await fetch(`${url}/api/v1/users/OutroCaso`);
-
-      expect(response2.status).toBe(200);
-
-      const response2Body = await response2.json();
-
-      expect(response2Body).toEqual({
-        id: response2Body.id,
+      await orchestrator.createUser({
         username: "outrocaso",
         email: "teste@teste.com",
-        password: response2Body.password,
-        created_at: response2Body.created_at,
-        updated_at: response2Body.updated_at,
+        password: "senha123",
       });
 
-      expect(uuidVersion(response2Body.id)).toBe(4);
-      expect(Date.parse(response2Body.created_at)).not.toBeNaN();
-      expect(Date.parse(response2Body.updated_at)).not.toBeNaN();
+      const response = await fetch(`${url}/api/v1/users/OutroCaso`);
+
+      expect(response.status).toBe(200);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        id: responseBody.id,
+        username: "outrocaso",
+        email: responseBody.email,
+        password: responseBody.password,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
+      });
+
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
     it("Retorna 404 para usuário inexistente", async () => {
