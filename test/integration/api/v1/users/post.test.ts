@@ -14,9 +14,9 @@ beforeEach(async () => {
   await orchestrator.runPendingMigrations();
 });
 
-describe("POST /users", () => {
+describe("POST /api/v1/users", () => {
   describe("Anonymous user", () => {
-    it("Com dados Validos", async () => {
+    it("Cria usuário com dados válidos", async () => {
       const response = await fetch(`${url}/api/v1/users`, {
         method: "POST",
         headers: {
@@ -62,7 +62,7 @@ describe("POST /users", () => {
       expect(incorrectPasswordMatch).toBe(false);
     });
 
-    it("Com email duplicado", async () => {
+    it("Retorna 400 para email já cadastrado", async () => {
       const response = await fetch(`${url}/api/v1/users`, {
         method: "POST",
         headers: {
@@ -95,13 +95,13 @@ describe("POST /users", () => {
 
       expect(response2Body).toEqual({
         name: "ValidationError",
-        message: "Não foi possível criar a conta com os dados informados.",
-        action: "Revise os dados ou tente recuperar o acesso à sua conta.",
+        message: "Não foi possível realizar esta operação.",
+        action: "Revise os dados e tente novamente.",
         status_code: 400,
       });
     });
 
-    it("Com username duplicado", async () => {
+    it("Retorna 400 para username já cadastrado", async () => {
       const response = await fetch(`${url}/api/v1/users`, {
         method: "POST",
         headers: {
@@ -134,8 +134,8 @@ describe("POST /users", () => {
 
       expect(response2Body).toEqual({
         name: "ValidationError",
-        message: "Não foi possível criar a conta com os dados informados.",
-        action: "Revise os dados ou tente recuperar o acesso à sua conta.",
+        message: "Não foi possível realizar esta operação.",
+        action: "Revise os dados e tente novamente.",
         status_code: 400,
       });
     });
