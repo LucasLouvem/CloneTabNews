@@ -6,6 +6,7 @@ import user from "models/user";
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
 router.get(getHandler);
+router.patch(patchHandler);
 
 export default router.handler(controller.errorHandler);
 
@@ -17,4 +18,18 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const result = await user.findOneByUsername(username);
 
   return res.status(200).send(result);
+}
+
+async function patchHandler(req: NextApiRequest, res: NextApiResponse) {
+  const username = req.query.username;
+
+  if (typeof username !== "string") {
+    return res.status(400).json({ message: "Nome de usuário inválido." });
+  }
+
+  const userInputValues = req.body;
+
+  const updatedUser = await user.update(username, userInputValues);
+
+  return res.status(200).send(updatedUser);
 }
