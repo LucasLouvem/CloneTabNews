@@ -44,6 +44,37 @@ export class ServiceError extends Error {
   }
 }
 
+export class UnauthorizedError extends Error {
+  action: string;
+  statusCode: number;
+
+  constructor({
+    cause,
+    message,
+    action,
+  }: {
+    cause?: unknown;
+    message?: string;
+    action?: string;
+  }) {
+    super(message || "Usuario não autenticado.", {
+      cause,
+    });
+    this.name = "UnauthorizedError";
+    this.action = action || "Realize a autenticação.";
+    this.statusCode = 401;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
 export class ValidationError extends Error {
   action: string;
   statusCode: number;
