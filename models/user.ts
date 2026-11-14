@@ -40,6 +40,29 @@ async function findOneByUsername(username: string) {
   return findUser.rows[0];
 }
 
+async function findOneByEmail(email: string) {
+  const findUser = await database.query<User>({
+    text: `
+      SELECT 
+        *
+      FROM
+        users 
+      WHERE 
+        LOWER(email) = LOWER($1)
+      ;`,
+    values: [email],
+  });
+
+  if (findUser.rows.length === 0) {
+    throw new NotFoundError({
+      message: "Email não encontrado.",
+      action: "Verifique o Email e tente novamente.",
+    });
+  }
+
+  return findUser.rows[0];
+}
+
 async function create(userInputValues: UserInputValues): Promise<User> {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
@@ -167,6 +190,7 @@ async function passwordHashObject(userInputValues: UserInputValues) {
 const user = {
   create,
   findOneByUsername,
+  findOneByEmail,
   update,
 };
 
