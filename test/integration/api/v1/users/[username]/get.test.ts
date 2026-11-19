@@ -1,7 +1,7 @@
 import orchestrator from "test/orchestrator";
 import { version as uuidVersion } from "uuid";
 
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -13,13 +13,13 @@ beforeEach(async () => {
 });
 
 describe("GET /api/v1/users/[username]", () => {
-  describe("Anonymous user", () => {
-    it("Encontra usuário com maiúsculas e minúsculas iguais", async () => {
+  describe("Usuário não autenticado", () => {
+    it("Retorna 200 quando o nome de usuário corresponde exatamente", async () => {
       await orchestrator.createUser({
         username: "MesmoCaso",
       });
 
-      const response = await fetch(`${url}/api/v1/users/MesmoCaso`);
+      const response = await fetch(`${baseUrl}/api/v1/users/MesmoCaso`);
 
       expect(response.status).toBe(200);
 
@@ -39,14 +39,14 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    it("Encontra usuário com maiúsculas e minúsculas diferentes", async () => {
+    it("Retorna 200 ignorando diferenças entre maiúsculas e minúsculas", async () => {
       await orchestrator.createUser({
         username: "outrocaso",
         email: "teste@teste.com",
         password: "senha123",
       });
 
-      const response = await fetch(`${url}/api/v1/users/OutroCaso`);
+      const response = await fetch(`${baseUrl}/api/v1/users/OutroCaso`);
 
       expect(response.status).toBe(200);
 
@@ -67,7 +67,7 @@ describe("GET /api/v1/users/[username]", () => {
     });
 
     it("Retorna 404 para usuário inexistente", async () => {
-      const response = await fetch(`${url}/api/v1/users/naoexistente`);
+      const response = await fetch(`${baseUrl}/api/v1/users/naoexistente`);
 
       expect(response.status).toBe(404);
 

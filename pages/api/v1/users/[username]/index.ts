@@ -15,9 +15,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   if (typeof username !== "string") {
     return res.status(400).json({ message: "Nome de usuário inválido." });
   }
-  const result = await user.findOneByUsername(username);
+  const foundUser = await user.findOneByUsername(username);
 
-  return res.status(200).send(result);
+  return res.status(200).send(foundUser);
 }
 
 async function patchHandler(req: NextApiRequest, res: NextApiResponse) {

@@ -7,9 +7,9 @@ async function authenticateUser(
   providedPassword: string,
 ) {
   try {
-    const userFound = await findUserByEmail(providedEmail);
-    await validatePassword(providedPassword, userFound.password);
-    return userFound;
+    const matchedUser = await findUserByEmail(providedEmail);
+    await validatePassword(providedPassword, matchedUser.password);
+    return matchedUser;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       throw new UnauthorizedError({
@@ -22,10 +22,10 @@ async function authenticateUser(
 }
 
 async function findUserByEmail(providedEmail: string) {
-  let userFound;
+  let matchedUser;
 
   try {
-    userFound = await user.findOneByEmail(providedEmail);
+    matchedUser = await user.findOneByEmail(providedEmail);
   } catch (error) {
     if (error instanceof NotFoundError) {
       throw new UnauthorizedError({
@@ -36,7 +36,7 @@ async function findUserByEmail(providedEmail: string) {
     throw error;
   }
 
-  return userFound;
+  return matchedUser;
 }
 
 async function validatePassword(

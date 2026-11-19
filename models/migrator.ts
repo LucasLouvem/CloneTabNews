@@ -1,9 +1,9 @@
 import { resolve } from "path";
 import { Client } from "pg";
 import database from "infra/database";
-import MigrationRunner from "node-pg-migrate";
+import runMigrations from "node-pg-migrate";
 
-const ConfigMigrationRunner = {
+const migrationRunnerOptions = {
   dir: resolve("infra", "migrations"),
   dryRun: true,
   direction: "up" as const,
@@ -16,8 +16,8 @@ let dbClient: Client | undefined;
 async function listPendingMigrations() {
   try {
     dbClient = await database.getNewClient();
-    const migrations = await MigrationRunner({
-      ...ConfigMigrationRunner,
+    const migrations = await runMigrations({
+      ...migrationRunnerOptions,
       dbClient,
     });
 
@@ -30,8 +30,8 @@ async function listPendingMigrations() {
 async function runningPendingMigrations() {
   try {
     dbClient = await database.getNewClient();
-    const migrations = await MigrationRunner({
-      ...ConfigMigrationRunner,
+    const migrations = await runMigrations({
+      ...migrationRunnerOptions,
       dbClient,
       dryRun: false,
     });
