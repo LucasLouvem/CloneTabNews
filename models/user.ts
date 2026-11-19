@@ -1,6 +1,10 @@
 import database from "infra/database";
 import password from "models/password";
-import { ValidationError, NotFoundError } from "infra/errors";
+import {
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+} from "infra/errors";
 
 export interface UserInputValues {
   username: string;
@@ -17,50 +21,104 @@ export interface User {
   updated_at: Date;
 }
 
-async function findOneByUsername(username: string) {
-  const findUser = await database.query<User>({
+async function findOneById(id: string) {
+  const queryResult = await database.query<User>({
     text: `
-      SELECT 
+      SELECT
         *
       FROM
-        users 
-      WHERE 
+        users
+      WHERE
+        id = $1
+      ;`,
+    values: [id],
+  });
+
+  if (queryResult.rows.length === 0) {
+    throw new NotFoundError({
+      message: "Usuário não encontrado para o ID informado.",
+      action: "Verifique o ID do usuário e tente novamente.",
+    });
+  }
+
+  return queryResult.rows[0];
+}
+
+async function findOneByUsername(username: string) {
+  const queryResult = await database.query<User>({
+    text: `
+      SELECT
+        *
+      FROM
+        users
+      WHERE
         LOWER(username) = LOWER($1)
       ;`,
     values: [username],
   });
 
-  if (findUser.rows.length === 0) {
+  if (queryResult.rows.length === 0) {
     throw new NotFoundError({
       message: "Usuário não encontrado.",
       action: "Verifique o nome de usuário e tente novamente.",
     });
   }
 
-  return findUser.rows[0];
+  return queryResult.rows[0];
 }
 
 async function findOneByEmail(email: string) {
-  const findUser = await database.query<User>({
+  const queryResult = await database.query<User>({
     text: `
-      SELECT 
+      SELECT
         *
       FROM
-        users 
-      WHERE 
+        users
+      WHERE
         LOWER(email) = LOWER($1)
       ;`,
     values: [email],
   });
 
-  if (findUser.rows.length === 0) {
+  if (queryResult.rows.length === 0) {
     throw new NotFoundError({
       message: "Email não encontrado.",
       action: "Verifique o Email e tente novamente.",
     });
   }
 
-  return findUser.rows[0];
+  return queryResult.rows[0];
+}
+
+async function findOneValidByToken(sessionToken: string) {
+  const validSession = await runSelectQuery(sessionToken);
+  return validSession;
+
+  async function runSelectQuery(sessionToken: string) {
+    const results = await database.query({
+      text: `
+      SELECT
+        *
+      FROM
+        sessions
+      WHERE
+        token = $1
+        AND expires_at > NOW()
+      LIMIT
+        1
+      ;`,
+      values: [sessionToken],
+    });
+
+    if (results.rows.length === 0) {
+      throw new UnauthorizedError({
+        message: "Sessão inválida ou expirada.",
+        action: "Faça login novamente para acessar este recurso.",
+      });
+    }
+
+    return results.rows[0];
+  }
 }
 
 async function create(userInputValues: UserInputValues): Promise<User> {
@@ -68,15 +126,15 @@ async function create(userInputValues: UserInputValues): Promise<User> {
   await validateUniqueUsername(userInputValues.username);
   await passwordHashObject(userInputValues);
 
-  const newUser = runInsertQuery(userInputValues);
-  return newUser;
+  const createdUser = runInsertQuery(userInputValues);
+  return createdUser;
 
   async function runInsertQuery(userInputValues: UserInputValues) {
     const insertResult = await database.query<User>({
       text: `
-      INSERT INTO 
-        users (username, email, password) 
-      VALUES 
+      INSERT INTO
+        users (username, email, password)
+      VALUES
         ($1, $2, $3)
       RETURNING
         *
@@ -93,7 +151,7 @@ async function create(userInputValues: UserInputValues): Promise<User> {
 }
 
 async function update(username: string, userInputValues: UserInputValues) {
-  const findUser = await findOneByUsername(username);
+  const existingUser = await findOneByUsername(username);
 
   if ("username" in userInputValues) {
     await validateUniqueUsername(userInputValues.username);
@@ -106,13 +164,13 @@ async function update(username: string, userInputValues: UserInputValues) {
   if ("password" in userInputValues) {
     await passwordHashObject(userInputValues);
   }
-  const userWithValues = { ...findUser, ...userInputValues };
+  const userWithUpdates = { ...existingUser, ...userInputValues };
 
-  const updatedUser = await runUpdateQuery(userWithValues);
+  const updatedUser = await runUpdateQuery(userWithUpdates);
   return updatedUser;
 
-  async function runUpdateQuery(userWithValues: User) {
-    const updatedQuery = await database.query<User>({
+  async function runUpdateQuery(userWithUpdates: User) {
+    const updateResult = await database.query<User>({
       text: `
       UPDATE
         users
@@ -127,24 +185,24 @@ async function update(username: string, userInputValues: UserInputValues) {
         *
       ;`,
       values: [
-        userWithValues.id,
-        userWithValues.username,
-        userWithValues.email,
-        userWithValues.password,
+        userWithUpdates.id,
+        userWithUpdates.username,
+        userWithUpdates.email,
+        userWithUpdates.password,
       ],
     });
-    return updatedQuery.rows[0];
+    return updateResult.rows[0];
   }
 }
 
 async function validateUniqueEmail(email: string) {
   const result = await database.query<Pick<User, "email">>({
     text: `
-      SELECT 
+      SELECT
         email
       FROM
-        users 
-      WHERE 
+        users
+      WHERE
         LOWER(email) = LOWER($1)
       ;`,
     values: [email],
@@ -162,11 +220,11 @@ async function validateUniqueEmail(email: string) {
 async function validateUniqueUsername(username: string) {
   const result = await database.query<Pick<User, "username">>({
     text: `
-      SELECT 
+      SELECT
         username
       FROM
-        users 
-      WHERE 
+        users
+      WHERE
         LOWER(username) = LOWER($1)
       ;`,
     values: [username],
@@ -182,8 +240,8 @@ async function validateUniqueUsername(username: string) {
 }
 
 async function passwordHashObject(userInputValues: UserInputValues) {
-  const userPassword = userInputValues.password;
-  const hashedPassword = await password.hash(userPassword);
+  const plainTextPassword = userInputValues.password;
+  const hashedPassword = await password.hash(plainTextPassword);
   return (userInputValues.password = hashedPassword);
 }
 
@@ -191,6 +249,8 @@ const user = {
   create,
   findOneByUsername,
   findOneByEmail,
+  findOneValidByToken,
+  findOneById,
   update,
 };
 
