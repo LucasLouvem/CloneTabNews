@@ -1,16 +1,16 @@
 import orchestrator from "test/orchestrator";
 
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.clearDatabase();
 });
 
-describe("DELETE /migrations", () => {
-  describe("Anonymous user", () => {
-    it("Retornar erro de método não permitido", async () => {
-      const response = await fetch(`${url}/api/v1/migrations`, {
+describe("DELETE /api/v1/migrations", () => {
+  describe("Usuário não autenticado", () => {
+    it("Retorna 405 para um método não permitido", async () => {
+      const response = await fetch(`${baseUrl}/api/v1/migrations`, {
         method: "DELETE",
       });
 

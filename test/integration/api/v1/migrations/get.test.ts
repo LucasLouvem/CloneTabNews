@@ -5,11 +5,11 @@ beforeAll(async () => {
   await orchestrator.clearDatabase();
 });
 
-const url = "http:127.0.0.1:3000";
-describe("GET /migrations", () => {
-  describe("Anonymous user", () => {
-    it("Recebe retorno da API de migrations", async () => {
-      const response = await fetch(`${url}/api/v1/migrations`);
+const baseUrl = "http:127.0.0.1:3000";
+describe("GET /api/v1/migrations", () => {
+  describe("Usuário não autenticado", () => {
+    it("Retorna 200 e lista as migrations pendentes", async () => {
+      const response = await fetch(`${baseUrl}/api/v1/migrations`);
 
       expect(response.status).toBe(200);
 

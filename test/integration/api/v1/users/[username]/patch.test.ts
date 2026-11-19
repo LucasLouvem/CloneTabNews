@@ -2,7 +2,7 @@ import password from "models/password";
 import user from "models/user";
 import orchestrator from "test/orchestrator";
 import { version as uuidVersion } from "uuid";
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -14,9 +14,9 @@ beforeEach(async () => {
 });
 
 describe("PATCH /api/v1/users/[username]", () => {
-  describe("Anonymous user", () => {
+  describe("Usuário não autenticado", () => {
     it("Retorna 404 para usuário inexistente", async () => {
-      const response = await fetch(`${url}/api/v1/users/naoexistente`, {
+      const response = await fetch(`${baseUrl}/api/v1/users/naoexistente`, {
         method: "PATCH",
       });
 
@@ -41,7 +41,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         username: "teste2",
       });
 
-      const response = await fetch(`${url}/api/v1/users/teste`, {
+      const response = await fetch(`${baseUrl}/api/v1/users/teste`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
@@ -73,7 +73,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         email: "teste2@teste.com",
       });
 
-      const response = await fetch(`${url}/api/v1/users/teste`, {
+      const response = await fetch(`${baseUrl}/api/v1/users/teste`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
@@ -100,7 +100,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         username: "teste",
       });
 
-      const response = await fetch(`${url}/api/v1/users/teste`, {
+      const response = await fetch(`${baseUrl}/api/v1/users/teste`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
@@ -136,7 +136,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         email: "teste@teste.com",
       });
 
-      const response = await fetch(`${url}/api/v1/users/teste`, {
+      const response = await fetch(`${baseUrl}/api/v1/users/teste`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
@@ -172,7 +172,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         password: "senha123",
       });
 
-      const response = await fetch(`${url}/api/v1/users/teste`, {
+      const response = await fetch(`${baseUrl}/api/v1/users/teste`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
@@ -203,18 +203,18 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       const userInDatabase = await user.findOneByUsername("teste");
 
-      const correctPasswordMatch = await password.compare(
+      const correctPasswordMatches = await password.compare(
         "novaSenha",
         userInDatabase.password,
       );
 
-      const inCorrectPasswordMatch = await password.compare(
+      const incorrectPasswordMatches = await password.compare(
         "senha123",
         userInDatabase.password,
       );
 
-      expect(correctPasswordMatch).toBe(true);
-      expect(inCorrectPasswordMatch).toBe(false);
+      expect(correctPasswordMatches).toBe(true);
+      expect(incorrectPasswordMatches).toBe(false);
     });
   });
 });

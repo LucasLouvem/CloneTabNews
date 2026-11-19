@@ -1,16 +1,16 @@
 import orchestrator from "test/orchestrator";
 
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.clearDatabase();
 });
 
-describe("GET /migrations", () => {
-  describe("Anonymous user", () => {
-    it("1° requisição roda as migrations do sistema", async () => {
-      const response = await fetch(`${url}/api/v1/migrations`, {
+describe("POST /api/v1/migrations", () => {
+  describe("Usuário não autenticado", () => {
+    it("Retorna 201 ao executar as migrations pendentes", async () => {
+      const response = await fetch(`${baseUrl}/api/v1/migrations`, {
         method: "POST",
       });
 
@@ -22,17 +22,17 @@ describe("GET /migrations", () => {
       expect(responseBody.length).toBeGreaterThan(0);
     });
 
-    it("2° requisição confirmando a execução", async () => {
-      const response2 = await fetch(`${url}/api/v1/migrations`, {
+    it("Retorna 200 quando não há migrations pendentes", async () => {
+      const response = await fetch(`${baseUrl}/api/v1/migrations`, {
         method: "POST",
       });
 
-      expect(response2.status).toBe(200);
+      expect(response.status).toBe(200);
 
-      const response2Body = await response2.json();
+      const responseBody = await response.json();
 
-      expect(Array.isArray(response2Body)).toEqual(true);
-      expect(response2Body.length).toBe(0);
+      expect(Array.isArray(responseBody)).toEqual(true);
+      expect(responseBody.length).toBe(0);
     });
   });
 });

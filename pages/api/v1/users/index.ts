@@ -11,7 +11,7 @@ export default router.handler(controller.errorHandler);
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const userInputValues = req.body;
-  const newUser = await user.create(userInputValues);
+  const createdUser = await user.create(userInputValues);
 
-  return res.status(201).send(newUser);
+  return res.status(201).send(createdUser);
 }

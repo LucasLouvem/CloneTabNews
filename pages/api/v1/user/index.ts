@@ -25,5 +25,10 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const authenticatedUser = await user.findOneById(validSession.user_id);
 
+  res.setHeader(
+    "Cache-Control",
+    "no-stored,no-cache,max-age=0,must-revalidate",
+  );
+
   return res.status(200).json(authenticatedUser);
 }

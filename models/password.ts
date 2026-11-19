@@ -1,12 +1,12 @@
 import bcryptjs from "bcryptjs";
 
 async function hash(password: string) {
-  const rounds = process.env.NODE_ENV === "production" ? 14 : 1;
-  return await bcryptjs.hash(password, rounds);
+  const saltRounds = process.env.NODE_ENV === "production" ? 14 : 1;
+  return await bcryptjs.hash(password, saltRounds);
 }
 
-async function compare(provided: string, storedPassword: string) {
-  return await bcryptjs.compare(provided, storedPassword);
+async function compare(providedPassword: string, storedPasswordHash: string) {
+  return await bcryptjs.compare(providedPassword, storedPasswordHash);
 }
 
 const password = {
