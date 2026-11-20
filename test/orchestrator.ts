@@ -35,12 +35,12 @@ async function waitForAllServices() {
   }
 }
 
-async function createUser(userOverrides: CreateUserOptions) {
+async function createUser(userOverrides?: CreateUserOptions) {
   return await user.create({
     username:
-      userOverrides.username || faker.internet.username().replace(/[.-_]/, ""),
-    email: userOverrides.email || faker.internet.email(),
-    password: userOverrides.password || faker.internet.password(),
+      userOverrides?.username || faker.internet.username().replace(/[.-_]/, ""),
+    email: userOverrides?.email || faker.internet.email(),
+    password: userOverrides?.password || faker.internet.password(),
   });
 }
 

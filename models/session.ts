@@ -66,10 +66,35 @@ async function renew(sessionId: string) {
   }
 }
 
+async function expiresSessionById(sessionId: string) {
+  const expiredSession = await deleteSession(sessionId);
+
+  return expiredSession;
+
+  async function deleteSession(sessionId: string) {
+    const result = await database.query({
+      text: `
+      UPDATE
+        sessions
+      SET
+        expires_at = expires_at - interval '1 year',
+        updated_at = NOW()
+      WHERE
+        id = $1
+      RETURNING
+        *
+      ;`,
+      values: [sessionId],
+    });
+    return result.rows[0];
+  }
+}
+
 const session = {
   create,
   renew,
   EXPIRES_IN_MILLISECONDS,
+  expiresSessionById,
 };
 
 export default session;
