@@ -31,6 +31,9 @@ describe("GET /api/v1/user", () => {
 
       expect(response.status).toBe(200);
 
+      const cacheControl = response.headers.get("Cache-Control");
+      expect(cacheControl).toBe("no-stored,no-cache,max-age=0,must-revalidate");
+
       const responseBody = await response.json();
 
       expect(responseBody).toEqual({
@@ -50,9 +53,6 @@ describe("GET /api/v1/user", () => {
       const renewedSession = await user.findOneValidByToken(
         createdSession.token,
       );
-
-      console.log(renewedSession.expires_at);
-      console.log(createdSession.expires_at);
 
       expect(renewedSession.expires_at > createdSession.expires_at).toBe(true);
       expect(renewedSession.updated_at > createdSession.updated_at).toBe(true);
