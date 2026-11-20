@@ -47,6 +47,16 @@ async function defineCookie(token: string, res: NextApiResponse) {
 
   res.setHeader("Set-Cookie", sessionCookie);
 }
+async function expireCookie(res: NextApiResponse) {
+  const expiredSessionCookie = cookie.serialize("session_id", "invalid", {
+    path: "/",
+    httpOnly: true,
+    maxAge: -1,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  res.setHeader("Set-Cookie", expiredSessionCookie);
+}
 
 const controller = {
   errorHandler: {
@@ -54,6 +64,7 @@ const controller = {
     onError: OnErrorHandler,
   },
   defineCookie,
+  expireCookie,
 };
 
 export default controller;

@@ -7,6 +7,7 @@ import session from "models/session";
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
 router.get(getHandler);
+router.delete(deleteHandler);
 
 export default router.handler(controller.errorHandler);
 
@@ -14,7 +15,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const sessionToken = req.cookies.session_id;
 
   if (typeof sessionToken !== "string") {
-    return res.status(401).json({ message: "Token invalido." });
+    return res
+      .status(401)
+      .json({ message: "Cookie de sessão ausente ou inválido." });
   }
 
   const validSession = await user.findOneValidByToken(sessionToken);
@@ -31,4 +34,22 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   );
 
   return res.status(200).json(authenticatedUser);
+}
+
+async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
+  const sessionToken = req.cookies.session_id;
+
+  if (typeof sessionToken !== "string") {
+    return res
+      .status(401)
+      .json({ message: "Cookie de sessão ausente ou inválido." });
+  }
+
+  const validSession = await user.findOneValidByToken(sessionToken);
+
+  const expiredSession = await session.expiresSessionById(validSession.id);
+
+  controller.expireCookie(res);
+
+  res.status(200).json(expiredSession);
 }
