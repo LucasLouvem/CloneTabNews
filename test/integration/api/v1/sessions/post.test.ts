@@ -116,6 +116,8 @@ describe("POST /api/v1/sessions", () => {
         map: true,
       });
 
+      console.log(cookiesByName);
+
       expect(cookiesByName.session_id).toEqual({
         name: "session_id",
         httpOnly: true,

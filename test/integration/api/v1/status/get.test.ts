@@ -1,6 +1,6 @@
 import orchestrator from "test/orchestrator";
 
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 interface StatusResponse {
   updated_at: Date;
   db_version: string;
@@ -13,10 +13,10 @@ beforeAll(async () => {
   await orchestrator.clearDatabase();
 });
 
-describe("GET /status", () => {
-  describe("Anonymous user", () => {
-    it("Recebe os dados da API de status", async () => {
-      const response = await fetch(`${url}/api/v1/status`);
+describe("GET /api/v1/status", () => {
+  describe("Usuário não autenticado", () => {
+    it("Retorna 200 e os dados de conexão do PostgreSQL", async () => {
+      const response = await fetch(`${baseUrl}/api/v1/status`);
 
       expect(response.status).toBe(200);
 

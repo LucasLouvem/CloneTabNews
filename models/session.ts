@@ -1,5 +1,6 @@
 import database from "infra/database";
 import crypto from "crypto";
+import { UnauthorizedError } from "infra/errors";
 
 const EXPIRES_IN_MILLISECONDS: number = 60 * 60 * 24 * 30 * 1000;
 
@@ -28,12 +29,46 @@ async function create(userId: string) {
       ;`,
       values: [token, userId, expiresAt],
     });
+
+    if (result.rows.length === 0) {
+      throw new UnauthorizedError({
+        message: "Id não encontrado.",
+        action: "Verifique o id e tente novamente.",
+      });
+    }
+    return result.rows[0];
+  }
+}
+
+async function renew(sessionId: string) {
+  const expiresAt = new Date(Date.now() + EXPIRES_IN_MILLISECONDS);
+
+  const renewedSession = await renewSession(sessionId, expiresAt);
+
+  return renewedSession;
+
+  async function renewSession(sessionId: string, expiresAt: Date) {
+    const result = await database.query({
+      text: `
+      UPDATE
+        sessions
+      SET
+        expires_at = $2,
+        updated_at = NOW()
+      WHERE
+        id = $1
+      RETURNING
+        *
+      ;`,
+      values: [sessionId, expiresAt],
+    });
     return result.rows[0];
   }
 }
 
 const session = {
   create,
+  renew,
   EXPIRES_IN_MILLISECONDS,
 };
 

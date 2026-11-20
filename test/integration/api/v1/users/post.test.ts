@@ -3,7 +3,7 @@ import user from "models/user";
 import { version as uuidVersion } from "uuid";
 import password from "models/password";
 
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -15,9 +15,9 @@ beforeEach(async () => {
 });
 
 describe("POST /api/v1/users", () => {
-  describe("Anonymous user", () => {
+  describe("Usuário não autenticado", () => {
     it("Cria usuário com dados válidos", async () => {
-      const response = await fetch(`${url}/api/v1/users`, {
+      const response = await fetch(`${baseUrl}/api/v1/users`, {
         method: "POST",
         headers: {
           "content-type": "application/JSON",
@@ -48,22 +48,22 @@ describe("POST /api/v1/users", () => {
 
       const userInDatabase = await user.findOneByUsername("teste");
 
-      const correctPasswordMatch = await password.compare(
+      const correctPasswordMatches = await password.compare(
         "senha123",
         userInDatabase.password,
       );
 
-      const incorrectPasswordMatch = await password.compare(
+      const incorrectPasswordMatches = await password.compare(
         "senhaErrada",
         userInDatabase.password,
       );
 
-      expect(correctPasswordMatch).toBe(true);
-      expect(incorrectPasswordMatch).toBe(false);
+      expect(correctPasswordMatches).toBe(true);
+      expect(incorrectPasswordMatches).toBe(false);
     });
 
     it("Retorna 400 para email já cadastrado", async () => {
-      const response = await fetch(`${url}/api/v1/users`, {
+      const response = await fetch(`${baseUrl}/api/v1/users`, {
         method: "POST",
         headers: {
           "content-type": "application/JSON",
@@ -77,7 +77,7 @@ describe("POST /api/v1/users", () => {
 
       expect(response.status).toBe(201);
 
-      const response2 = await fetch(`${url}/api/v1/users`, {
+      const duplicateResponse = await fetch(`${baseUrl}/api/v1/users`, {
         method: "POST",
         headers: {
           "content-type": "application/JSON",
@@ -89,11 +89,11 @@ describe("POST /api/v1/users", () => {
         }),
       });
 
-      expect(response2.status).toBe(400);
+      expect(duplicateResponse.status).toBe(400);
 
-      const response2Body = await response2.json();
+      const duplicateResponseBody = await duplicateResponse.json();
 
-      expect(response2Body).toEqual({
+      expect(duplicateResponseBody).toEqual({
         name: "ValidationError",
         message: "Não foi possível realizar esta operação.",
         action: "Revise os dados e tente novamente.",
@@ -102,7 +102,7 @@ describe("POST /api/v1/users", () => {
     });
 
     it("Retorna 400 para username já cadastrado", async () => {
-      const response = await fetch(`${url}/api/v1/users`, {
+      const response = await fetch(`${baseUrl}/api/v1/users`, {
         method: "POST",
         headers: {
           "content-type": "application/JSON",
@@ -116,7 +116,7 @@ describe("POST /api/v1/users", () => {
 
       expect(response.status).toBe(201);
 
-      const response2 = await fetch(`${url}/api/v1/users`, {
+      const duplicateResponse = await fetch(`${baseUrl}/api/v1/users`, {
         method: "POST",
         headers: {
           "content-type": "application/JSON",
@@ -128,11 +128,11 @@ describe("POST /api/v1/users", () => {
         }),
       });
 
-      expect(response2.status).toBe(400);
+      expect(duplicateResponse.status).toBe(400);
 
-      const response2Body = await response2.json();
+      const duplicateResponseBody = await duplicateResponse.json();
 
-      expect(response2Body).toEqual({
+      expect(duplicateResponseBody).toEqual({
         name: "ValidationError",
         message: "Não foi possível realizar esta operação.",
         action: "Revise os dados e tente novamente.",

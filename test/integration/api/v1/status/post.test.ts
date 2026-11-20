@@ -1,6 +1,6 @@
 import orchestrator from "test/orchestrator";
 
-const url = "http:127.0.0.1:3000";
+const baseUrl = "http:127.0.0.1:3000";
 interface StatusResponse {
   name: string;
   message: string;
@@ -13,10 +13,10 @@ beforeAll(async () => {
   await orchestrator.clearDatabase();
 });
 
-describe("POST /status", () => {
-  describe("Anonymous user", () => {
-    it("Recebe os dados da API de status", async () => {
-      const response = await fetch(`${url}/api/v1/status`, {
+describe("POST /api/v1/status", () => {
+  describe("Usuário não autenticado", () => {
+    it("Retorna 405 para um método não permitido", async () => {
+      const response = await fetch(`${baseUrl}/api/v1/status`, {
         method: "POST",
       });
 

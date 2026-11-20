@@ -3,8 +3,9 @@ import retry from "async-retry";
 import migrator from "models/migrator";
 import user from "models/user";
 import { faker } from "@faker-js/faker";
+import session from "models/session";
 
-type CreateUser = {
+type CreateUserOptions = {
   username?: string;
   email?: string;
   password?: string;
@@ -34,13 +35,17 @@ async function waitForAllServices() {
   }
 }
 
-async function createUser(userObj: CreateUser) {
+async function createUser(userOverrides: CreateUserOptions) {
   return await user.create({
     username:
-      userObj.username || faker.internet.username().replace(/[.-_]/, ""),
-    email: userObj.email || faker.internet.email(),
-    password: userObj.password || faker.internet.password(),
+      userOverrides.username || faker.internet.username().replace(/[.-_]/, ""),
+    email: userOverrides.email || faker.internet.email(),
+    password: userOverrides.password || faker.internet.password(),
   });
+}
+
+async function createSession(userId: string) {
+  return await session.create(userId);
 }
 
 async function runPendingMigrations() {
@@ -52,6 +57,7 @@ const orchestrator = {
   waitForAllServices,
   runPendingMigrations,
   createUser,
+  createSession,
 };
 
 export default orchestrator;

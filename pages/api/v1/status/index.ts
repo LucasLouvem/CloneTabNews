@@ -24,25 +24,27 @@ async function getHandler(
 ) {
   const updatedAt = new Date().toISOString();
 
-  const dbVersion = await database.query("SHOW server_version;");
-  const serverVersion = dbVersion.rows[0].server_version;
+  const versionQueryResult = await database.query("SHOW server_version;");
+  const serverVersion = versionQueryResult.rows[0].server_version;
 
-  const maxConnections = await database.query("SHOW max_connections;");
-  const maxUsageConnections = maxConnections.rows[0].max_connections;
+  const maxConnectionsQueryResult = await database.query(
+    "SHOW max_connections;",
+  );
+  const maxConnectionsValue = maxConnectionsQueryResult.rows[0].max_connections;
 
-  const databasedb = process.env.POSTGRES_DB;
-  const usageConnections = await database.query({
+  const databaseName = process.env.POSTGRES_DB;
+  const openedConnectionsQueryResult = await database.query({
     text: "SELECT count(*)::int FROM pg_stat_activity WHERE datname = $1;",
-    values: [databasedb],
+    values: [databaseName],
   });
-  const usageConnection = usageConnections.rows[0].count;
+  const openedConnectionsCount = openedConnectionsQueryResult.rows[0].count;
 
   return res.status(200).send({
     updated_at: updatedAt,
     dependencies: {
       version: serverVersion,
-      max_connections: parseInt(maxUsageConnections),
-      opened_connections: usageConnection,
+      max_connections: parseInt(maxConnectionsValue),
+      opened_connections: openedConnectionsCount,
     },
   });
 }
