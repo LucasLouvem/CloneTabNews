@@ -7,3 +7,11 @@ services:
       - ../.env.development
     ports:
       - ${POSTGRES_PORT}:5432
+  mailcatcher:
+    container_name: mailcatcher-dev
+    image: sj26/mailcatcher
+    env_file:
+      - ../.env.development
+    ports:
+      - ${SMTP_HTTP_PORT}:1080
+      - ${SMTP_PORT}:1025
